@@ -102,5 +102,60 @@ namespace BowlingGame.Tests
             Assert.Equal(FrameStatus.Bowled, bowlingGame.PreviousFrame.Status);
             Assert.Equal(FrameStatus.Strike, bowlingGame.BeforePreviousFrame.Status);
         }
+
+        [Fact]
+        public void Roll_2strike_and_2bowls()
+        {
+            var bowlingGame = new Game();
+
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(4);
+            bowlingGame.Roll(2);
+
+            Assert.Equal(4, bowlingGame.CurrentFrameNumber);
+            Assert.Equal(46, bowlingGame.Score);
+            Assert.Equal(0, bowlingGame.CurrentFrame.Score);
+            Assert.Equal(6, bowlingGame.PreviousFrame.Score);
+            Assert.Equal(16, bowlingGame.BeforePreviousFrame.Score);
+
+            Assert.Equal(0, bowlingGame.CurrentFrame.Attempts);
+            Assert.Equal(2, bowlingGame.PreviousFrame.Attempts);
+            Assert.Equal(1, bowlingGame.BeforePreviousFrame.Attempts);
+
+            Assert.Equal(FrameStatus.Ready, bowlingGame.CurrentFrame.Status);
+            Assert.Equal(FrameStatus.Bowled, bowlingGame.PreviousFrame.Status);
+            Assert.Equal(FrameStatus.Strike, bowlingGame.BeforePreviousFrame.Status);
+        }
+
+        [Fact]
+        public void Roll_a_perfect_game()
+        {
+            var bowlingGame = new Game();
+
+            // ten strikes
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            Console.WriteLine($"Score: {bowlingGame.Score}");
+
+            // two extra rolls
+            bowlingGame.Roll(10);
+            Console.WriteLine($"Score: {bowlingGame.Score}");
+            bowlingGame.Roll(10);
+            Console.WriteLine($"Score: {bowlingGame.Score}");
+
+            Assert.True(bowlingGame.NoMorePlays);
+            Assert.Equal(3, bowlingGame.CurrentFrame.Attempts);
+            Assert.Equal(10, bowlingGame.CurrentFrameNumber);
+            Assert.Equal(300, bowlingGame.Score);
+        }
     }
 }

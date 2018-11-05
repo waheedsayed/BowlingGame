@@ -7,8 +7,8 @@ namespace BowlingGame
     {
         private const int TenFrames = 10;
         private const int TenPins = 10;
+        private const int FirstAttempt = 1;
         private const int SecondAttempt = 2;
-
 
         public Frame[] Frames { get; private set; } = new Frame[TenFrames];
 
@@ -16,6 +16,8 @@ namespace BowlingGame
         public Frame CurrentFrame => this[CurrentFrameNumber];
         public Frame PreviousFrame => this[CurrentFrameNumber-1];
         public Frame BeforePreviousFrame => this[CurrentFrameNumber-2];
+        public int ExtraDueRolls { get; private set; } = 0;
+        public bool NoMorePlays  { get; private set; } = false;
 
         public int Score => Frames.Sum(f => f.Score);
 
@@ -42,6 +44,10 @@ namespace BowlingGame
             // Decide to advance frame or not
             // Calculate score for current frame, and previous if applicable 
             // Validation: number <= 10
+            // Validation: NoMorePlays is false
+
+            if (NoMorePlays)
+                throw new Exception("GAME OVER!");
 
             this[CurrentFrameNumber].Roll(numberOfPins);
 
@@ -60,7 +66,20 @@ namespace BowlingGame
             }
             else
             {
-                throw new NotImplementedException();
+                if (CurrentFrame.Status == FrameStatus.Strike && CurrentFrame.Attempts == FirstAttempt)
+                    ExtraDueRolls = 2;
+
+                if (CurrentFrame.Status == FrameStatus.Spare && CurrentFrame.Attempts == SecondAttempt)
+                    ExtraDueRolls = 1;
+
+                if (--ExtraDueRolls < 0)
+                    NoMorePlays = true;
+
+                if (PreviousFrame.DueBonus >= 1)
+                    PreviousFrame.AddBonus(numberOfPins);
+
+                if (BeforePreviousFrame.DueBonus >= 1)
+                    BeforePreviousFrame.AddBonus(numberOfPins);
             }
         }
     }

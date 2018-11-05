@@ -25,19 +25,25 @@ namespace BowlingGame
             Attempts++;
             Score += numberOfPins;
 
-            if (Score == TenPins && Attempts == FirstAttempt)
+            if (Status == FrameStatus.Ready)
             {
-                Status = FrameStatus.Strike;
-                DueBonus = 2;
+                if (numberOfPins == TenPins && Attempts == FirstAttempt)
+                {
+                    Status = FrameStatus.Strike;
+                    DueBonus = 2;
+                }
+                else
+                {
+                    Status = FrameStatus.Bowled;
+                }
             }
-            else if (Score == TenPins && Attempts == SecondAttempt)
+            if (Status == FrameStatus.Bowled)
             {
-                Status = FrameStatus.Spare;
-                DueBonus = 1;
-            }
-            else
-            {
-                Status = FrameStatus.Bowled;
+                if (Score == TenPins && Attempts == SecondAttempt)
+                {
+                    Status = FrameStatus.Spare;
+                    DueBonus = 1;
+                }
             }
         }
 
