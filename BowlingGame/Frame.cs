@@ -12,6 +12,7 @@ namespace BowlingGame
         public int Attempts { get; private set;} = 0; 
         public int Score { get; private set;} = 0;
         public FrameStatus Status { get; private set; } = FrameStatus.Ready;
+        public int DueBonus { get; private set; }  = 0;
 
         public void Roll(int numberOfPins)
         {
@@ -25,18 +26,34 @@ namespace BowlingGame
             Score += numberOfPins;
 
             if (Score == TenPins && Attempts == FirstAttempt)
+            {
                 Status = FrameStatus.Strike;
+                DueBonus = 2;
+            }
             else if (Score == TenPins && Attempts == SecondAttempt)
+            {
                 Status = FrameStatus.Spare;
+                DueBonus = 1;
+            }
             else
+            {
                 Status = FrameStatus.Bowled;
+            }
         }
 
-        public void AddBonusScore(int score)
+        public void AddBonus(int numberOfPins)
         {
             // Add bonus score to this frame
-            // Validation score <= 10 (per addition)
-            throw new NotImplementedException(); 
+            // Validate due bonus
+            if (DueBonus == 0)
+                throw new InvalidOperationException("Cannot add bonus while no bonus is due!");
+
+            // Validate score <= 10 (per addition)
+            if (numberOfPins < NoPins || numberOfPins > TenPins)
+                throw new ArgumentOutOfRangeException(nameof(numberOfPins), "Acceptable range: [0-10]");
+
+            DueBonus--;
+            Score += numberOfPins;
         }
     }
 }

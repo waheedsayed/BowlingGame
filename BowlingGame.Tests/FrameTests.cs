@@ -72,6 +72,7 @@ namespace BowlingGame.Tests
             frame.Roll(10);
             Assert.Equal(FrameStatus.Strike, frame.Status);
             Assert.Equal(10, frame.Score);
+            Assert.Equal(2, frame.DueBonus);
         }
 
         [Fact]
@@ -82,6 +83,7 @@ namespace BowlingGame.Tests
             frame.Roll(5);
             Assert.Equal(FrameStatus.Spare, frame.Status);
             Assert.Equal(10, frame.Score);
+            Assert.Equal(1, frame.DueBonus);
         }
     }
 }

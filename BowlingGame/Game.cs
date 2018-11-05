@@ -1,15 +1,39 @@
 ﻿using System;
+using System.Linq;
 
 namespace BowlingGame
 {
     public class Game
     {
-        public Frame[] Frames { get; private set; }
+        private const int TenFrames = 10;
+        private const int TenPins = 10;
+        private const int SecondAttempt = 2;
 
-        public void Start()
+
+        public Frame[] Frames { get; private set; } = new Frame[TenFrames];
+
+        public int CurrentFrameNumber { get; private set; } = 1;
+        public Frame CurrentFrame => this[CurrentFrameNumber];
+        public Frame PreviousFrame => this[CurrentFrameNumber-1];
+        public Frame BeforePreviousFrame => this[CurrentFrameNumber-2];
+
+        public int Score => Frames.Sum(f => f.Score);
+
+        public Game()
         {
-            // Initialise 10 frames            
-            throw new NotImplementedException(); 
+            // Initialise the 10 frames
+            for (int i = 0; i < TenFrames; i++)
+            {
+                Frames[i] = new Frame();
+            }
+        }
+
+        public Frame this[int index]
+        {
+            get {
+                if (index - 1 < 0) return null;
+                return Frames[index-1];
+            }
         }
 
         public void Roll(int numberOfPins)
@@ -18,13 +42,26 @@ namespace BowlingGame
             // Decide to advance frame or not
             // Calculate score for current frame, and previous if applicable 
             // Validation: number <= 10
-            throw new NotImplementedException(); 
-        }
 
-        public int Score()
-        {
-            // Return game total score
-            throw new NotImplementedException(); 
+            this[CurrentFrameNumber].Roll(numberOfPins);
+
+            if (CurrentFrameNumber < TenFrames)
+            {
+                if (PreviousFrame?.DueBonus >= 1)
+                    PreviousFrame?.AddBonus(numberOfPins);
+
+                if (BeforePreviousFrame?.DueBonus >= 1)
+                    BeforePreviousFrame?.AddBonus(numberOfPins);
+
+                if (numberOfPins == TenPins)
+                    CurrentFrameNumber++;
+                else if (CurrentFrame.Attempts == SecondAttempt)
+                    CurrentFrameNumber++;
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }
