@@ -24,7 +24,7 @@ task Clean {
 task Build -depend Clean {
     if ($runSonarScanner) {
         exec {
-            dotnet-sonarscanner begin /k:"$project_key" /d:sonar.host.url="$sonarqube_host_url" /d:sonar.login="$sonarqube_login" /d:sonar.organization="$sonarqube_organisation" /d:sonar.cs.opencover.reportsPaths="**\coverage.opencover.xml" /d:sonar.coverage.exclusions="**Tests*.cs"
+            & dotnet-sonarscanner begin /k:"$project_key" /d:sonar.host.url="$sonarqube_host_url" /d:sonar.login="$sonarqube_login" /d:sonar.organization="$sonarqube_organisation" /d:sonar.cs.opencover.reportsPaths="**\coverage.opencover.xml" /d:sonar.coverage.exclusions="**Tests*.cs"
         }    
     }
 
@@ -40,7 +40,7 @@ task UnitTests -depend Build {
 
     if ($runSonarScanner) {
         exec {
-            dotnet-sonarscanner end /d:sonar.login="$sonarqube_login"
+            & dotnet-sonarscanner end /d:sonar.login="$sonarqube_login"
         }    
     }
 }
