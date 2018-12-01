@@ -37,7 +37,7 @@ namespace BowlingGame.Tests
 
             var exception = Assert.Throws<ArgumentOutOfRangeException>(() => frame.Roll(numberOfPins)); 
 
-            exception.Message.ShouldBe("Acceptable range: [0-10]\nParameter name: numberOfPins");
+            exception.Message.ShouldBe($"Acceptable range: [0-10]{Environment.NewLine}Parameter name: numberOfPins");
             frame.Status.ShouldBe(FrameStatus.Ready);
             frame.Score.ShouldBe(0);
         }
