@@ -137,7 +137,31 @@ namespace BowlingGame.Tests
             bowlingGame.CurrentFrameNumber.ShouldBe(10); // This is the last frame
             bowlingGame.Score.ShouldBe(300); // Perfect game score
 
-            Assert.True(bowlingGame.GameOver);
+            Assert.True(bowlingGame.IsGameOver);
+        }
+
+        [Fact]
+        public void Roll_throws_exception_if_a_roll_happens_after_game_is_over()
+        {
+            var bowlingGame = new Game();
+
+            // ten strikes
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            // two extra rolls
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+
+            var exception = Assert.Throws<InvalidOperationException>(() => bowlingGame.Roll(1));
+            exception.Message.ShouldBe("GAME OVER!");
         }
     }
 }

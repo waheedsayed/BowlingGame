@@ -14,7 +14,7 @@ namespace BowlingGame
 
         public int CurrentFrameNumber { get; private set; } = 1;
         public Frame[] Frames { get; private set; } = new Frame[TenFrames];
-        public bool GameOver  { get; private set; } = false;
+        public bool IsGameOver  { get; private set; } = false;
         public int Score => Frames.Sum(f => f.Score);
 
         public Frame CurrentFrame => this[CurrentFrameNumber];
@@ -46,8 +46,8 @@ namespace BowlingGame
             // Validation: number <= 10
             // Validation: NoMorePlays is false
 
-            if (GameOver)
-                throw new Exception("GAME OVER!");
+            if (IsGameOver)
+                throw new InvalidOperationException("GAME OVER!");
 
             this[CurrentFrameNumber].Roll(numberOfPins);
 
@@ -73,7 +73,7 @@ namespace BowlingGame
                     ExtraDueRolls = 1;
 
                 if (--ExtraDueRolls < 0)
-                    GameOver = true;
+                    IsGameOver = true;
 
                 if (PreviousFrame.DueBonus >= 1)
                     PreviousFrame.AddBonus(numberOfPins);
