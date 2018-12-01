@@ -1,5 +1,5 @@
 properties {
-    $runSonarScanner = $$true
+    $runSonarScanner = $true
     $project_key = "bowlinggame"
     $sonarqube_host_url = $env:SonarCloud_URL
     $sonarqube_login = $env:SonarCloud_Token
