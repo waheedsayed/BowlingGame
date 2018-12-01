@@ -51,36 +51,47 @@ namespace BowlingGame
 
             this[CurrentFrameNumber].Roll(numberOfPins);
 
+            DistributeBonus(numberOfPins);
+
             if (CurrentFrameNumber < TenFrames)
             {
-                if (PreviousFrame?.DueBonus >= 1)
-                    PreviousFrame?.AddBonus(numberOfPins);
-
-                if (PrePreviousFrame?.DueBonus >= 1)
-                    PrePreviousFrame?.AddBonus(numberOfPins);
-
-                if (numberOfPins == TenPins)
-                    CurrentFrameNumber++;
-                else if (CurrentFrame.Attempts == SecondAttempt)
-                    CurrentFrameNumber++;
+                CheckToAdvanceFrame(numberOfPins);
             }
             else
             {
-                if (CurrentFrame.Status == FrameStatus.Strike && CurrentFrame.Attempts == FirstAttempt)
-                    ExtraDueRolls = 2;
-
-                if (CurrentFrame.Status == FrameStatus.Spare && CurrentFrame.Attempts == SecondAttempt)
-                    ExtraDueRolls = 1;
-
-                if (--ExtraDueRolls < 0)
-                    IsGameOver = true;
-
-                if (PreviousFrame.DueBonus >= 1)
-                    PreviousFrame.AddBonus(numberOfPins);
-
-                if (PrePreviousFrame.DueBonus >= 1)
-                    PrePreviousFrame.AddBonus(numberOfPins);
+                ClaimExtraRolls();
+                CheckIfGameOver();
             }
+        }
+
+        private void CheckToAdvanceFrame(int numberOfPins)
+        {
+            if (numberOfPins == TenPins || CurrentFrame.Attempts == SecondAttempt)
+                CurrentFrameNumber++;
+        }
+
+        private void DistributeBonus(int numberOfPins)
+        {
+            if (PreviousFrame?.DueBonus >= 1)
+                PreviousFrame?.AddBonus(numberOfPins);
+
+            if (PrePreviousFrame?.DueBonus >= 1)
+                PrePreviousFrame?.AddBonus(numberOfPins);
+        }
+
+        private void ClaimExtraRolls()
+        {
+            if (CurrentFrame.Status == FrameStatus.Strike && CurrentFrame.Attempts == FirstAttempt)
+                ExtraDueRolls = 2;
+
+            if (CurrentFrame.Status == FrameStatus.Spare && CurrentFrame.Attempts == SecondAttempt)
+                ExtraDueRolls = 1;
+        }
+
+        private void CheckIfGameOver()
+        {
+            if (--ExtraDueRolls < 0)
+                IsGameOver = true;
         }
     }
 }
