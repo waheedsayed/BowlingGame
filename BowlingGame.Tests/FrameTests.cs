@@ -1,52 +1,29 @@
 using System;
+using Shouldly;
 using Xunit;
-using BowlingGame;
 
 namespace BowlingGame.Tests
 {
     public class FrameTests
     {
         [Fact]
-        public void Status_is_ready_before_rolling()
+        public void New_Frame_Status_is_Ready_and_Score_and_Attempts_are_Zeros()
         {
             var frame = new Frame();
-            Assert.Equal(FrameStatus.Ready, frame.Status);
+            frame.Status.ShouldBe(FrameStatus.Ready);
+            frame.Score.ShouldBe(0);
+            frame.Attempts.ShouldBe(0);
         }
 
         [Fact]
-        public void Score_is_Zero_before_rolling()
+        public void Roll_accepts_from_Zero_to_Ten_pins()
         {
-            var frame = new Frame();
-            Assert.Equal(FrameStatus.Ready, frame.Status);
-        }
-
-        [Theory]
-        [InlineData(0)]
-        [InlineData(1)]
-        [InlineData(2)]
-        [InlineData(3)]
-        [InlineData(4)]
-        [InlineData(5)]
-        [InlineData(6)]
-        [InlineData(7)]
-        [InlineData(8)]
-        [InlineData(9)]
-        public void Roll_accepts_from_Zero_to_Ten_pins1(int numberOfPins)
-        {
-            var frame = new Frame();
-            frame.Roll(numberOfPins);
-            Assert.Equal(numberOfPins, frame.Score);
-            Assert.Equal(FrameStatus.Bowled, frame.Status);
-        }
-
-        [Theory]
-        [InlineData(10)]
-        public void Roll_accepts_from_Zero_to_Ten_pins2(int numberOfPins)
-        {
-            var frame = new Frame();
-            frame.Roll(numberOfPins);
-            Assert.Equal(numberOfPins, frame.Score);
-            Assert.Equal(FrameStatus.Strike, frame.Status);
+            for (int numberOfPins = 0; numberOfPins <= 10; numberOfPins++)
+            {
+                var frame = new Frame();
+                frame.Roll(numberOfPins);
+                frame.Score.ShouldBe(numberOfPins);
+            }
         }
 
         [Theory]
@@ -60,30 +37,58 @@ namespace BowlingGame.Tests
 
             var exception = Assert.Throws<ArgumentOutOfRangeException>(() => frame.Roll(numberOfPins)); 
 
-            Assert.Equal("Acceptable range: [0-10]\nParameter name: numberOfPins", exception.Message);
-            Assert.Equal(FrameStatus.Ready, frame.Status);
-            Assert.Equal(0, frame.Score);
+            exception.Message.ShouldBe("Acceptable range: [0-10]\nParameter name: numberOfPins");
+            frame.Status.ShouldBe(FrameStatus.Ready);
+            frame.Score.ShouldBe(0);
         }
 
         [Fact]
-        public void Roll_a_Strike_from_first_attempt()
+        public void Status_is_Bowled_after_1st_attempt_score_less_than_Ten()
+        {
+            for (int numberOfPins = 0; numberOfPins <= 9; numberOfPins++)
+            {
+                var frame = new Frame();
+                frame.Roll(numberOfPins);
+                frame.Attempts.ShouldBe(1);
+                frame.Status.ShouldBe(FrameStatus.Bowled);
+            }
+        }
+
+        [Fact]
+        public void Status_is_Bowled_after_2nd_attempt_score_less_than_Ten()
+        {
+            for (int numberOfPins = 0; numberOfPins <= 9; numberOfPins++)
+            {
+                var frame = new Frame();
+                frame.Roll(9 - numberOfPins);
+                frame.Roll(numberOfPins);
+                frame.Attempts.ShouldBe(2);
+                frame.Status.ShouldBe(FrameStatus.Bowled);
+            }
+        }
+
+        [Fact]
+        public void Status_is_Strike_after_1st_attempt_and_Score_is_Ten_and_Two_DueBonus()
         {
             var frame = new Frame();
             frame.Roll(10);
-            Assert.Equal(FrameStatus.Strike, frame.Status);
-            Assert.Equal(10, frame.Score);
-            Assert.Equal(2, frame.DueBonus);
+            frame.Status.ShouldBe(FrameStatus.Strike);
+            frame.Score.ShouldBe(10);
+            frame.DueBonus.ShouldBe(2);
         }
 
         [Fact]
-        public void Roll_a_Spare_from_second_attempt()
+        public void Status_is_Spare_after_2nd_attempt_Score_is_Ten_and_One_DueBonus()
         {
-            var frame = new Frame();
-            frame.Roll(5);
-            frame.Roll(5);
-            Assert.Equal(FrameStatus.Spare, frame.Status);
-            Assert.Equal(10, frame.Score);
-            Assert.Equal(1, frame.DueBonus);
+            for (int numberOfPins = 1; numberOfPins <= 10; numberOfPins++)
+            {
+                var frame = new Frame();
+                frame.Roll(10 - numberOfPins);
+                frame.Roll(numberOfPins);
+                frame.Score.ShouldBe(10);
+                frame.Status.ShouldBe(FrameStatus.Spare);
+                frame.DueBonus.ShouldBe(1);
+            }
         }
     }
 }

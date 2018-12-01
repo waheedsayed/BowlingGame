@@ -10,16 +10,16 @@ namespace BowlingGame
         private const int FirstAttempt = 1;
         private const int SecondAttempt = 2;
 
-        public Frame[] Frames { get; private set; } = new Frame[TenFrames];
+        private int ExtraDueRolls = 0;
 
         public int CurrentFrameNumber { get; private set; } = 1;
+        public Frame[] Frames { get; private set; } = new Frame[TenFrames];
+        public bool GameOver  { get; private set; } = false;
+        public int Score => Frames.Sum(f => f.Score);
+
         public Frame CurrentFrame => this[CurrentFrameNumber];
         public Frame PreviousFrame => this[CurrentFrameNumber-1];
-        public Frame BeforePreviousFrame => this[CurrentFrameNumber-2];
-        public int ExtraDueRolls { get; private set; } = 0;
-        public bool NoMorePlays  { get; private set; } = false;
-
-        public int Score => Frames.Sum(f => f.Score);
+        public Frame PrePreviousFrame => this[CurrentFrameNumber-2];
 
         public Game()
         {
@@ -46,7 +46,7 @@ namespace BowlingGame
             // Validation: number <= 10
             // Validation: NoMorePlays is false
 
-            if (NoMorePlays)
+            if (GameOver)
                 throw new Exception("GAME OVER!");
 
             this[CurrentFrameNumber].Roll(numberOfPins);
@@ -56,8 +56,8 @@ namespace BowlingGame
                 if (PreviousFrame?.DueBonus >= 1)
                     PreviousFrame?.AddBonus(numberOfPins);
 
-                if (BeforePreviousFrame?.DueBonus >= 1)
-                    BeforePreviousFrame?.AddBonus(numberOfPins);
+                if (PrePreviousFrame?.DueBonus >= 1)
+                    PrePreviousFrame?.AddBonus(numberOfPins);
 
                 if (numberOfPins == TenPins)
                     CurrentFrameNumber++;
@@ -73,13 +73,13 @@ namespace BowlingGame
                     ExtraDueRolls = 1;
 
                 if (--ExtraDueRolls < 0)
-                    NoMorePlays = true;
+                    GameOver = true;
 
                 if (PreviousFrame.DueBonus >= 1)
                     PreviousFrame.AddBonus(numberOfPins);
 
-                if (BeforePreviousFrame.DueBonus >= 1)
-                    BeforePreviousFrame.AddBonus(numberOfPins);
+                if (PrePreviousFrame.DueBonus >= 1)
+                    PrePreviousFrame.AddBonus(numberOfPins);
             }
         }
     }
