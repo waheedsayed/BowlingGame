@@ -1,19 +1,23 @@
+// No pins means bowler has knocked nothing of the pins
+// A perfect game means the bowler has knocked all pins in every attemtp
+
 using System;
 using Xunit;
 using BowlingGame;
+using Shouldly;
 
 namespace BowlingGame.Tests
 {
     public class GameTests
     {
         [Fact]
-        public void Game_has_Ten_frames_and_current_is_One()
+        public void New_Game_has_Ten_frames_and_current_is_One()
         {
             var bowlingGame = new Game();
 
-            Assert.Equal(1, bowlingGame.CurrentFrameNumber);
-            Assert.Equal(10, bowlingGame.Frames.Length);
-            Assert.Equal(0, bowlingGame.Score);
+            bowlingGame.CurrentFrameNumber.ShouldBe(1);
+            bowlingGame.Frames.Length.ShouldBe(10);
+            bowlingGame.Score.ShouldBe(0);
 
             foreach(var frame in bowlingGame.Frames)
             {
@@ -22,29 +26,24 @@ namespace BowlingGame.Tests
         }
 
         [Fact]
-        public void Roll_a_NoPins_bowl()
+        public void Roll_a_no_pins()
         {
             var bowlingGame = new Game();
 
             bowlingGame.Roll(0);
-            Assert.Equal(0, bowlingGame.Score);
-            Assert.Equal(1, bowlingGame.CurrentFrameNumber);
-            Assert.Equal(0, bowlingGame.CurrentFrame.Score);
-            Assert.Equal(1, bowlingGame.CurrentFrame.Attempts);
+            bowlingGame.Score.ShouldBe(0);
+            bowlingGame.CurrentFrameNumber.ShouldBe(1);
         }
 
         [Fact]
-        public void Roll_a_second_NoPins_bowl()
+        public void Roll_a_second_no_pins()
         {
             var bowlingGame = new Game();
 
             bowlingGame.Roll(0);
             bowlingGame.Roll(0);
-            Assert.Equal(0, bowlingGame.Score);
-            Assert.Equal(2, bowlingGame.CurrentFrameNumber);
-            Assert.Equal(0, bowlingGame.CurrentFrame.Score);
-            Assert.Equal(0, bowlingGame.PreviousFrame.Score);
-            Assert.Equal(2, bowlingGame.PreviousFrame.Attempts);
+            bowlingGame.Score.ShouldBe(0);
+            bowlingGame.CurrentFrameNumber.ShouldBe(2);
         }
 
         [Fact]
@@ -54,11 +53,8 @@ namespace BowlingGame.Tests
 
             bowlingGame.Roll(5);
             bowlingGame.Roll(5);
-            Assert.Equal(10, bowlingGame.Score);
-            Assert.Equal(2, bowlingGame.CurrentFrameNumber);
-            Assert.Equal(0, bowlingGame.CurrentFrame.Score);
-            Assert.Equal(10, bowlingGame.PreviousFrame.Score);
-            Assert.Equal(2, bowlingGame.PreviousFrame.Attempts);
+            bowlingGame.Score.ShouldBe(10);
+            bowlingGame.CurrentFrameNumber.ShouldBe(2);
         }
 
 
@@ -70,13 +66,11 @@ namespace BowlingGame.Tests
             bowlingGame.Roll(7);
             bowlingGame.Roll(3);
             bowlingGame.Roll(4);
-            Assert.Equal(4, bowlingGame.CurrentFrame.Score);
-            Assert.Equal(1, bowlingGame.CurrentFrame.Attempts);
-            Assert.Equal(14, bowlingGame.PreviousFrame.Score);
-            Assert.Equal(2, bowlingGame.PreviousFrame.Attempts);
+            bowlingGame.CurrentFrame.Score.ShouldBe(4);
+            bowlingGame.PreviousFrame.Score.ShouldBe(14);
             bowlingGame.Roll(2);
-            Assert.Equal(20, bowlingGame.Score);
-            Assert.Equal(3, bowlingGame.CurrentFrameNumber);
+            bowlingGame.Score.ShouldBe(20);
+            bowlingGame.CurrentFrameNumber.ShouldBe(3);
         }
 
         [Fact]
@@ -88,19 +82,11 @@ namespace BowlingGame.Tests
             bowlingGame.Roll(3);
             bowlingGame.Roll(6);
 
-            Assert.Equal(3, bowlingGame.CurrentFrameNumber);
-            Assert.Equal(28, bowlingGame.Score);
-            Assert.Equal(0, bowlingGame.CurrentFrame.Score);
-            Assert.Equal(9, bowlingGame.PreviousFrame.Score);
-            Assert.Equal(19, bowlingGame.BeforePreviousFrame.Score);
-
-            Assert.Equal(0, bowlingGame.CurrentFrame.Attempts);
-            Assert.Equal(2, bowlingGame.PreviousFrame.Attempts);
-            Assert.Equal(1, bowlingGame.BeforePreviousFrame.Attempts);
-
-            Assert.Equal(FrameStatus.Ready, bowlingGame.CurrentFrame.Status);
-            Assert.Equal(FrameStatus.Bowled, bowlingGame.PreviousFrame.Status);
-            Assert.Equal(FrameStatus.Strike, bowlingGame.BeforePreviousFrame.Status);
+            bowlingGame.CurrentFrameNumber.ShouldBe(3);
+            bowlingGame.Score.ShouldBe(28);
+            bowlingGame.CurrentFrame.Score.ShouldBe(0);
+            bowlingGame.PreviousFrame.Score.ShouldBe(9);
+            bowlingGame.PrePreviousFrame.Score.ShouldBe(19);
         }
 
         [Fact]
@@ -113,19 +99,15 @@ namespace BowlingGame.Tests
             bowlingGame.Roll(4);
             bowlingGame.Roll(2);
 
-            Assert.Equal(4, bowlingGame.CurrentFrameNumber);
-            Assert.Equal(46, bowlingGame.Score);
-            Assert.Equal(0, bowlingGame.CurrentFrame.Score);
-            Assert.Equal(6, bowlingGame.PreviousFrame.Score);
-            Assert.Equal(16, bowlingGame.BeforePreviousFrame.Score);
+            bowlingGame.CurrentFrameNumber.ShouldBe(4);
+            bowlingGame.Score.ShouldBe(46);
+            bowlingGame.CurrentFrame.Score.ShouldBe(0);
+            bowlingGame.PreviousFrame.Score.ShouldBe(6);
+            bowlingGame.PrePreviousFrame.Score.ShouldBe(16);
 
-            Assert.Equal(0, bowlingGame.CurrentFrame.Attempts);
-            Assert.Equal(2, bowlingGame.PreviousFrame.Attempts);
-            Assert.Equal(1, bowlingGame.BeforePreviousFrame.Attempts);
-
-            Assert.Equal(FrameStatus.Ready, bowlingGame.CurrentFrame.Status);
-            Assert.Equal(FrameStatus.Bowled, bowlingGame.PreviousFrame.Status);
-            Assert.Equal(FrameStatus.Strike, bowlingGame.BeforePreviousFrame.Status);
+            bowlingGame.CurrentFrame.Status.ShouldBe(FrameStatus.Ready);
+            bowlingGame.PreviousFrame.Status.ShouldBe(FrameStatus.Bowled);
+            bowlingGame.PrePreviousFrame.Status.ShouldBe(FrameStatus.Strike);
         }
 
         [Fact]
@@ -144,18 +126,42 @@ namespace BowlingGame.Tests
             bowlingGame.Roll(10);
             bowlingGame.Roll(10);
             bowlingGame.Roll(10);
-            Console.WriteLine($"Score: {bowlingGame.Score}");
+            Console.WriteLine($"Score of ten strikes: {bowlingGame.Score}");
 
             // two extra rolls
             bowlingGame.Roll(10);
-            Console.WriteLine($"Score: {bowlingGame.Score}");
             bowlingGame.Roll(10);
-            Console.WriteLine($"Score: {bowlingGame.Score}");
+            Console.WriteLine($"Score after 2 extra rolls: {bowlingGame.Score}");
 
-            Assert.True(bowlingGame.NoMorePlays);
-            Assert.Equal(3, bowlingGame.CurrentFrame.Attempts);
-            Assert.Equal(10, bowlingGame.CurrentFrameNumber);
-            Assert.Equal(300, bowlingGame.Score);
+            bowlingGame.CurrentFrame.Attempts.ShouldBe(3); // The only exceptional time that you get 3 attempts
+            bowlingGame.CurrentFrameNumber.ShouldBe(10); // This is the last frame
+            bowlingGame.Score.ShouldBe(300); // Perfect game score
+
+            Assert.True(bowlingGame.IsGameOver);
+        }
+
+        [Fact]
+        public void Roll_throws_exception_if_a_roll_happens_after_game_is_over()
+        {
+            var bowlingGame = new Game();
+
+            // ten strikes
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+            // two extra rolls
+            bowlingGame.Roll(10);
+            bowlingGame.Roll(10);
+
+            var exception = Assert.Throws<InvalidOperationException>(() => bowlingGame.Roll(1));
+            exception.Message.ShouldBe("GAME OVER!");
         }
     }
 }

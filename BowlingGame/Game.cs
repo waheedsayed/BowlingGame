@@ -10,16 +10,16 @@ namespace BowlingGame
         private const int FirstAttempt = 1;
         private const int SecondAttempt = 2;
 
-        public Frame[] Frames { get; private set; } = new Frame[TenFrames];
+        private int ExtraDueRolls = 0;
 
         public int CurrentFrameNumber { get; private set; } = 1;
+        public Frame[] Frames { get; private set; } = new Frame[TenFrames];
+        public bool IsGameOver  { get; private set; } = false;
+        public int Score => Frames.Sum(f => f.Score);
+
         public Frame CurrentFrame => this[CurrentFrameNumber];
         public Frame PreviousFrame => this[CurrentFrameNumber-1];
-        public Frame BeforePreviousFrame => this[CurrentFrameNumber-2];
-        public int ExtraDueRolls { get; private set; } = 0;
-        public bool NoMorePlays  { get; private set; } = false;
-
-        public int Score => Frames.Sum(f => f.Score);
+        public Frame PrePreviousFrame => this[CurrentFrameNumber-2];
 
         public Game()
         {
@@ -46,41 +46,52 @@ namespace BowlingGame
             // Validation: number <= 10
             // Validation: NoMorePlays is false
 
-            if (NoMorePlays)
-                throw new Exception("GAME OVER!");
+            if (IsGameOver)
+                throw new InvalidOperationException("GAME OVER!");
 
             this[CurrentFrameNumber].Roll(numberOfPins);
 
+            DistributeBonus(numberOfPins);
+
             if (CurrentFrameNumber < TenFrames)
             {
-                if (PreviousFrame?.DueBonus >= 1)
-                    PreviousFrame?.AddBonus(numberOfPins);
-
-                if (BeforePreviousFrame?.DueBonus >= 1)
-                    BeforePreviousFrame?.AddBonus(numberOfPins);
-
-                if (numberOfPins == TenPins)
-                    CurrentFrameNumber++;
-                else if (CurrentFrame.Attempts == SecondAttempt)
-                    CurrentFrameNumber++;
+                CheckToAdvanceFrame(numberOfPins);
             }
             else
             {
-                if (CurrentFrame.Status == FrameStatus.Strike && CurrentFrame.Attempts == FirstAttempt)
-                    ExtraDueRolls = 2;
-
-                if (CurrentFrame.Status == FrameStatus.Spare && CurrentFrame.Attempts == SecondAttempt)
-                    ExtraDueRolls = 1;
-
-                if (--ExtraDueRolls < 0)
-                    NoMorePlays = true;
-
-                if (PreviousFrame.DueBonus >= 1)
-                    PreviousFrame.AddBonus(numberOfPins);
-
-                if (BeforePreviousFrame.DueBonus >= 1)
-                    BeforePreviousFrame.AddBonus(numberOfPins);
+                ClaimExtraRolls();
+                CheckIfGameOver();
             }
+        }
+
+        private void CheckToAdvanceFrame(int numberOfPins)
+        {
+            if (numberOfPins == TenPins || CurrentFrame.Attempts == SecondAttempt)
+                CurrentFrameNumber++;
+        }
+
+        private void DistributeBonus(int numberOfPins)
+        {
+            if (PreviousFrame?.DueBonus >= 1)
+                PreviousFrame?.AddBonus(numberOfPins);
+
+            if (PrePreviousFrame?.DueBonus >= 1)
+                PrePreviousFrame?.AddBonus(numberOfPins);
+        }
+
+        private void ClaimExtraRolls()
+        {
+            if (CurrentFrame.Status == FrameStatus.Strike && CurrentFrame.Attempts == FirstAttempt)
+                ExtraDueRolls = 2;
+
+            if (CurrentFrame.Status == FrameStatus.Spare && CurrentFrame.Attempts == SecondAttempt)
+                ExtraDueRolls = 1;
+        }
+
+        private void CheckIfGameOver()
+        {
+            if (--ExtraDueRolls < 0)
+                IsGameOver = true;
         }
     }
 }

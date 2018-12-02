@@ -22,29 +22,16 @@ namespace BowlingGame
                 throw new ArgumentOutOfRangeException(nameof(numberOfPins), "Acceptable range: [0-10]");
             // We can validate number of attempts per frame here but I won't - according to test instructions.
 
+            if ((Status == FrameStatus.Strike || Status == FrameStatus.Spare) && DueBonus == 0)
+                throw new InvalidOperationException("Cannot roll for this frame any more");
+
             Attempts++;
             Score += numberOfPins;
 
-            if (Status == FrameStatus.Ready)
-            {
-                if (numberOfPins == TenPins && Attempts == FirstAttempt)
-                {
-                    Status = FrameStatus.Strike;
-                    DueBonus = 2;
-                }
-                else
-                {
-                    Status = FrameStatus.Bowled;
-                }
-            }
-            if (Status == FrameStatus.Bowled)
-            {
-                if (Score == TenPins && Attempts == SecondAttempt)
-                {
-                    Status = FrameStatus.Spare;
-                    DueBonus = 1;
-                }
-            }
+            if (CheckIfStrike() || CheckIfSpare())
+                return;
+
+            Status = FrameStatus.Bowled;
         }
 
         public void AddBonus(int numberOfPins)
@@ -60,6 +47,30 @@ namespace BowlingGame
 
             DueBonus--;
             Score += numberOfPins;
+        }
+
+        private bool CheckIfStrike()
+        {
+            if (Status == FrameStatus.Ready && Score == TenPins && Attempts == FirstAttempt)
+            {
+                Status = FrameStatus.Strike;
+                DueBonus = 2;
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool CheckIfSpare()
+        {
+            if (Status == FrameStatus.Bowled && Score == TenPins && Attempts == SecondAttempt)
+            {
+                Status = FrameStatus.Spare;
+                DueBonus = 1;
+                return true;
+            }
+
+            return false;
         }
     }
 }
