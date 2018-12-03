@@ -1,4 +1,5 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/5pnp09e4rn9ftycb?svg=true)](https://ci.appveyor.com/project/waheedsayed/bowlinggame)
+![Quality gate](https://sonarcloud.io/api/project_badges/measure?project=bowlinggame&metric=alert_status)
 
 # Bowling Game
 
